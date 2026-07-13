@@ -250,3 +250,79 @@ footer {
     color: #5a5a7a;
     padding: 40px 0;
 }
+
+/* Filter bar */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #8888aa;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.checkbox-label input[type="checkbox"] {
+    accent-color: #3a7bd5;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-label {
+    font-size: 13px;
+    color: #6a6a8a;
+    white-space: nowrap;
+}
+
+.pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.pill {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid #2a2a4a;
+    background-color: #16213e;
+    color: #8888aa;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pill:hover {
+    border-color: #3a7bd5;
+    color: #c0c0e0;
+}
+
+.pill.active {
+    background-color: #3a7bd5;
+    border-color: #3a7bd5;
+    color: #ffffff;
+}
+
+.col-type {
+    width: 18%;
+}
+
+.svc-type {
+    color: #7a7a9a;
+    font-size: 12px;
+}
