@@ -1,5 +1,15 @@
+import webview
+
 def main():
-    print("Hello from wintools!")
+    window = webview.create_window(
+        "Wintools",
+        url="app/ui/home.html",
+        width=600,
+        height=500,
+        resizable=True,
+        min_size=(400, 350),
+    )
+    webview.start()
 
 
 if __name__ == "__main__":
