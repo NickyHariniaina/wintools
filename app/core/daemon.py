@@ -7,7 +7,6 @@ def get_services():
     )
     raw = win32service.EnumServicesStatusEx(
         scm,
-        win32service.SERVICE_STATE_ALL,
         win32service.SERVICE_WIN32,
         win32service.SERVICE_STATE_ALL,
     )
@@ -28,7 +27,7 @@ def get_services():
         services.append({
             "name": svc["ServiceName"],
             "display_name": svc["DisplayName"],
-            "status": status_map.get(svc["Status"], "Unknown"),
+            "status": status_map.get(svc["CurrentState"], "Unknown"),
         })
 
     services.sort(key=lambda s: s["name"].lower())
