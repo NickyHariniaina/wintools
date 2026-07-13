@@ -112,3 +112,141 @@ footer {
     font-size: 14px;
     color: #4caf50;
 }
+
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #8888aa;
+}
+
+.back-link {
+    color: #3a7bd5;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.separator {
+    color: #4a4a6a;
+}
+
+/* Search bar */
+.search-bar {
+    margin-bottom: 14px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 10px 14px;
+    background-color: #16213e;
+    border: 1px solid #2a2a4a;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.search-bar input:focus {
+    border-color: #3a7bd5;
+}
+
+.search-bar input::placeholder {
+    color: #5a5a7a;
+}
+
+/* Service table */
+.service-table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #2a2a4a;
+    border-radius: 8px;
+}
+
+.service-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.service-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.service-table th {
+    background-color: #16213e;
+    color: #8888aa;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid #2a2a4a;
+}
+
+.service-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #1e1e3a;
+}
+
+.service-table tbody tr:hover {
+    background-color: #1a2a4a;
+}
+
+.col-name {
+    width: 30%;
+}
+
+.col-display {
+    width: 50%;
+}
+
+.col-status {
+    width: 20%;
+}
+
+.svc-name {
+    color: #c0c0e0;
+    font-family: 'Consolas', monospace;
+    font-size: 12px;
+}
+
+.svc-display {
+    color: #a0a0c0;
+}
+
+.svc-status {
+    white-space: nowrap;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.status-running {
+    background-color: #4caf50;
+}
+
+.status-stopped {
+    background-color: #666688;
+}
+
+.status-other {
+    background-color: #f0ad4e;
+}
+
+.loading-text {
+    text-align: center;
+    color: #5a5a7a;
+    padding: 40px 0;
+}

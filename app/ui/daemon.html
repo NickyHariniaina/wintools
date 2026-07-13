@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Daemons</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="breadcrumb">
+                <a href="home.html" class="back-link">&#x2190; Wintools</a>
+                <span class="separator">/</span>
+                <span>Manage Daemons</span>
+            </div>
+        </header>
+
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Search services..." autocomplete="off">
+        </div>
+
+        <div class="service-table-wrapper">
+            <table class="service-table">
+                <thead>
+                    <tr>
+                        <th class="col-name">Name</th>
+                        <th class="col-display">Display Name</th>
+                        <th class="col-status">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="service-list">
+                    <tr>
+                        <td colspan="3" class="loading-text">Loading services...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer>
+            <span class="status-text" id="status-bar">Loading...</span>
+        </footer>
+    </div>
+
+    <script>
+        async function loadServices() {
+            const services = await window.pywebview.api.get_services();
+            const tbody = document.getElementById("service-list");
+            tbody.innerHTML = "";
+
+            for (const svc of services) {
+                const tr = document.createElement("tr");
+                tr.dataset.name = svc.name.toLowerCase();
+                tr.dataset.display = svc.display_name.toLowerCase();
+
+                const statusClass =
+                    svc.status === "Running" ? "status-running" :
+                    svc.status === "Stopped" ? "status-stopped" : "status-other";
+
+                tr.innerHTML =
+                    '<td class="svc-name">' + escapeHtml(svc.name) + '</td>' +
+                    '<td class="svc-display">' + escapeHtml(svc.display_name) + '</td>' +
+                    '<td class="svc-status"><span class="status-dot ' + statusClass + '"></span> ' + escapeHtml(svc.status) + '</td>';
+
+                tbody.appendChild(tr);
+            }
+
+            const running = services.filter(s => s.status === "Running").length;
+            const stopped = services.filter(s => s.status === "Stopped").length;
+            document.getElementById("status-bar").textContent =
+                "Total: " + services.length + " services | Running: " + running + " | Stopped: " + stopped;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById("search").addEventListener("input", function () {
+            const query = this.value.toLowerCase();
+            const rows = document.querySelectorAll("#service-list tr");
+            let visible = 0;
+
+            for (const row of rows) {
+                const match =
+                    row.dataset.name.includes(query) ||
+                    row.dataset.display.includes(query);
+                row.style.display = match ? "" : "none";
+                if (match) visible++;
+            }
+        });
+
+        window.addEventListener("pywebviewready", loadServices);
+    </script>
+</body>
+</html>
