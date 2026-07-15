@@ -113,3 +113,27 @@ def start_service(service_name, machine=None, wait=True):
         
     except Exception as e:
         return {"success": False, "message": str(e)}
+
+# The only main diff between stop and start service is the StopService
+# function calling. Is there a better way to refactor it?
+def stop_service(service_name, machine=None, wait=True):
+    try:
+        status = win32serviceutil.QueryServiceStatus(service_name, machine)
+        if status[1] == win32service.SERVICE_STOPPED:
+            return {"success": True, "message": f"'{service_name}' is already stopped"}
+
+        win32serviceutil.StopService(service_name, machine)
+
+        if wait:
+            start_time = time.time()
+            while time.time() - start_time < TIMEOUT_IN_SECOND:
+                status = win32serviceutil.QueryServiceStatus(service_name, machine)
+                if status[1] == win32service.SERVICE_STOPPED:
+                    return {"success": True, "message": f"'{service_name}' stopped"}
+                time.sleep(1)
+            return {"success": False, "message": "Timeout reached for stopping service"}
+
+        return {"success": True, "message": f"'{service_name}' stop requested"}
+
+    except Exception as e:
+        return {"success": False, "message": str(e)}
