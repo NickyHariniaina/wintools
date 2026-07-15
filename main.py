@@ -1,11 +1,17 @@
 import webview
 
-from app.core.daemon import get_running_services
+from app.core.daemon import get_running_services, get_stopped_services, start_service
 
 
 class Api:
-    def get_services(self):
+    def get_running_services(self):
         return get_running_services()
+
+    def get_stopped_services(self):
+        return get_stopped_services()
+    
+    def start_service(self):
+        return start_service()
 
 
 def main():

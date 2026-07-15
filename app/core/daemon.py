@@ -1,4 +1,6 @@
 import win32service
+import win32serviceutil
+import time
 
 """
 A little bit of theory won't kill.
@@ -7,7 +9,15 @@ They both run in background but the main diff is in the manager, the OS, and the
 Service use services.msc and linux use systemctl
 It is harder to use manage service on windows. That's why this backend is here.
 """
-
+STATUS_MAP = {
+    1: "Stopped",
+    2: "Start Pending",
+    3: "Stop Pending",
+    4: "Running",
+    5: "Continue Pending",
+    6: "Pause Pending",
+    7: "Paused",
+}
 TYPES_MAP = {
     win32service.SERVICE_WIN32_OWN_PROCESS: "Own Process",
     win32service.SERVICE_WIN32_SHARE_PROCESS: "Share Process",
@@ -15,27 +25,26 @@ TYPES_MAP = {
     win32service.SERVICE_FILE_SYSTEM_DRIVER: "File System Driver"
 }
 
-def open_SCM_with_all_access():
-    return win32service.OpenSCManager(None, None, win32service.SC_MANAGER_ALL_ACCESS)
+def open_SCM_with_enumerate_service():
+    return win32service.OpenSCManager(None, None, win32service.SC_MANAGER_ENUMERATE_SERVICE)
 
 def query(scm, service_type, service_status):
     return win32service.EnumServicesStatusEx(scm, service_type, service_status)
 
 def get_stopped_services():
-    scm = open_SCM_with_all_access()
-
-    # Is there a better way to fetch 3 type at the same type?
-    # I should create an array and then mix them later.
-    raw = query(scm, win32service.SERVICE_WIN32, win32service.SERVICE_STOPPED)
+    scm = open_SCM_with_enumerate_service()
+    raw = query(scm, win32service.SERVICE_WIN32, win32service.SERVICE_STATE_ALL)
     win32service.CloseServiceHandle(scm)
 
     services = []
     for svc in raw:
+        if svc["CurrentState"] != win32service.SERVICE_STOPPED:
+            continue
         services.append({
             "name": svc["ServiceName"],
             "display_name": svc["DisplayName"],
-            "status": "Stopped",
-            "service_type": TYPES_MAP.get(svc["ServiceType"], "Other")
+            "service_type": TYPES_MAP.get(svc["ServiceType"], "Other"),
+            "status": STATUS_MAP.get(svc["CurrentState"], "Unknown")
         })
 
     services.sort(key=lambda service: service["name"].lower())
@@ -48,9 +57,9 @@ def get_running_services():
     # Later I want to give full access so I may need to refactor this win32Service so I can
     # use the SC_MANAGER_ALL_ACCESS. *DONE
 
-    scm = open_SCM_with_all_access()
+    scm = open_SCM_with_enumerate_service()
     
-    raw = query(scm, win32service.SERVICE_WIN32, win32service.SERVICE_ACTIVE)
+    raw = query(scm, win32service.SERVICE_WIN32, win32service.SERVICE_STATE_ALL)
 
     win32service.CloseServiceHandle(scm)
 
@@ -68,12 +77,45 @@ def get_running_services():
 
     services = []
     for svc in raw:
+        print(svc)
         services.append({
             "name": svc["ServiceName"],
             "display_name": svc["DisplayName"],
-            "status": "Running",
-            "service_type": TYPES_MAP.get(svc["ServiceType"], "Other")
+            "service_type": TYPES_MAP.get(svc["ServiceType"], "Other"),
+            "status": STATUS_MAP.get(svc["CurrentState"], "Unknown")
         })
 
     services.sort(key=lambda service: service["name"].lower())
     return services
+
+# services=get_running_services()
+# print(services)
+
+def start_service(service_name, machine=None, wait=True):
+    try:
+        status = win32serviceutil.QueryServiceStatus(service_name, machine)
+        if status[1] == win32service.SERVICE_RUNNING:
+            print(f"Service '{service_name}' is already running")
+            return True
+        
+        print(f"Starting service '{service_name}'...")
+        win32serviceutil.StartService(service_name, machine)
+        
+        if wait:
+            # Wait for service to start (optional)
+            timeout = 30  # seconds
+            start_time = time.time()
+            while time.time() - start_time < timeout:
+                status = win32serviceutil.QueryServiceStatus(service_name, machine)
+                if status[1] == win32service.SERVICE_RUNNING:
+                    print(f"Service '{service_name}' started successfully")
+                    return True
+                time.sleep(1)
+            print(f"Timeout waiting for service '{service_name}' to start")
+            return False
+        
+        return True
+        
+    except Exception as e:
+        print(f"Failed to start service '{service_name}': {e}")
+        return False

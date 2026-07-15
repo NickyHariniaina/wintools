@@ -4,7 +4,410 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Daemons</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Reset and Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #1e293b;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            width: 1000px;
+            max-width: 98vw;
+            max-height: 95vh;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            padding: 20px 28px;
+            border-bottom: 1px solid #e9edf2;
+            flex-shrink: 0;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #1d4ed8;
+        }
+
+        .separator {
+            color: #94a3b8;
+        }
+
+        /* Tab Bar */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            padding: 0 28px;
+            border-bottom: 1px solid #e9edf2;
+            flex-shrink: 0;
+        }
+
+        .tab {
+            padding: 12px 20px 10px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: #1e293b;
+            background: #f8fafc;
+        }
+
+        .tab.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            padding: 16px 28px;
+            flex-shrink: 0;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .search-bar input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            padding: 0 28px 16px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #475569;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: #2563eb;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 4px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            background: white;
+            font-size: 12px;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .pill:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .pill.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        .pill.active:hover {
+            background: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        /* Table */
+        .service-table-wrapper {
+            flex: 1;
+            overflow: auto;
+            padding: 0 28px 4px;
+        }
+
+        .service-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .service-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .service-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: #f8fafc;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            border-bottom: 2px solid #e9edf2;
+        }
+
+        .service-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .service-table tbody tr:hover {
+            background: #fafbfc;
+        }
+
+        .col-name {
+            width: 25%;
+        }
+
+        .col-display {
+            width: 35%;
+        }
+
+        .col-type {
+            width: 20%;
+        }
+
+        .col-status {
+            width: 20%;
+        }
+
+        .svc-name {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            color: #0f172a;
+        }
+
+        .svc-display {
+            color: #1e293b;
+        }
+
+        .svc-type {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .svc-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-running {
+            background: #22c55e;
+        }
+
+        .status-stopped {
+            background: #ef4444;
+        }
+
+        .status-other {
+            background: #f59e0b;
+        }
+
+        .loading-text {
+            text-align: center;
+            padding: 40px 0;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            padding: 12px 28px;
+            border-top: 1px solid #e9edf2;
+            flex-shrink: 0;
+            background: #fafbfc;
+        }
+
+        .status-text {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* Scrollbar Styling */
+        .service-table-wrapper::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .service-table-wrapper::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .service-table-wrapper::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .service-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100vw;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            header {
+                padding: 16px 16px;
+            }
+
+            .tab-bar {
+                padding: 0 16px;
+                overflow-x: auto;
+            }
+
+            .search-bar {
+                padding: 12px 16px;
+            }
+
+            .filter-bar {
+                padding: 0 16px 12px;
+                gap: 12px;
+            }
+
+            .service-table-wrapper {
+                padding: 0 12px 4px;
+            }
+
+            .service-table th,
+            .service-table td {
+                padding: 8px 8px;
+                font-size: 13px;
+            }
+
+            .col-name {
+                width: 30%;
+            }
+            .col-display {
+                width: 30%;
+            }
+            .col-type {
+                width: 20%;
+            }
+            .col-status {
+                width: 20%;
+            }
+
+            footer {
+                padding: 10px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .col-display {
+                display: none;
+            }
+
+            .service-table th:nth-child(2),
+            .service-table td:nth-child(2) {
+                display: none;
+            }
+
+            .col-name {
+                width: 40%;
+            }
+            .col-type {
+                width: 25%;
+            }
+            .col-status {
+                width: 35%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,6 +418,11 @@
                 <span>Manage Daemons</span>
             </div>
         </header>
+
+        <div class="tab-bar">
+            <button class="tab active" data-tab="running" id="tab-running">Running</button>
+            <button class="tab" data-tab="stopped" id="tab-stopped">Stopped</button>
+        </div>
 
         <div class="search-bar">
             <input type="text" id="search" placeholder="Search services..." autocomplete="off">
@@ -57,12 +465,36 @@
     <script>
         let allServices = [];
         let activeType = "All";
+        let activeTab = "running";
 
-        async function loadServices() {
-            allServices = await window.pywebview.api.get_services();
-            buildTypeFilters(allServices);
-            renderTable(allServices);
-            updateStatusBar(allServices.length, allServices.length);
+        async function loadServices(tab) {
+            activeTab = tab || "running";
+
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            document.getElementById("tab-" + activeTab).classList.add("active");
+
+            document.getElementById("search").value = "";
+            activeType = "All";
+
+            // Show loading state
+            const tbody = document.getElementById("service-list");
+            tbody.innerHTML = '<tr><td colspan="4" class="loading-text">Loading services...</td></tr>';
+
+            try {
+                if (activeTab === "running") {
+                    allServices = await window.pywebview.api.get_running_services();
+                } else {
+                    allServices = await window.pywebview.api.get_stopped_services();
+                }
+
+                buildTypeFilters(allServices);
+                renderTable(allServices);
+                updateStatusBar(allServices.length, allServices.length);
+            } catch (error) {
+                console.error("Failed to load services:", error);
+                tbody.innerHTML = '<tr><td colspan="4" class="loading-text">Failed to load services. Please try again.</td></tr>';
+                document.getElementById("status-bar").textContent = "Error loading services";
+            }
         }
 
         function buildTypeFilters(services) {
@@ -95,6 +527,11 @@
             const tbody = document.getElementById("service-list");
             tbody.innerHTML = "";
 
+            if (!services || services.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="loading-text">No services found</td></tr>';
+                return;
+            }
+
             for (const svc of services) {
                 const tr = document.createElement("tr");
                 tr.dataset.name = svc.name.toLowerCase();
@@ -121,7 +558,12 @@
             const rows = document.querySelectorAll("#service-list tr");
             let visible = 0;
 
+            // Skip the "No services found" or loading row
             for (const row of rows) {
+                if (row.querySelector(".loading-text")) {
+                    continue;
+                }
+
                 const matchesSearch = nameOnly
                     ? row.dataset.name.includes(query)
                     : row.dataset.name.includes(query) || row.dataset.display.includes(query);
@@ -133,6 +575,8 @@
                 if (show) visible++;
             }
 
+            // Count total rows (excluding loading/empty message)
+            const totalRows = rows.length - (document.querySelector(".loading-text") ? 1 : 0);
             updateStatusBar(visible, allServices.length);
         }
 
@@ -151,9 +595,29 @@
             return div.innerHTML;
         }
 
+        // Event listeners
+        document.getElementById("tab-running").addEventListener("click", function () {
+            loadServices("running");
+        });
+
+        document.getElementById("tab-stopped").addEventListener("click", function () {
+            loadServices("stopped");
+        });
+
         document.getElementById("search").addEventListener("input", applyFilters);
         document.getElementById("name-only").addEventListener("change", applyFilters);
-        window.addEventListener("pywebviewready", loadServices);
+
+        // Initialize on page load
+        window.addEventListener("pywebviewready", function () {
+            loadServices("running");
+        });
+
+        // Fallback if pywebviewready doesn't fire
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof window.pywebview !== 'undefined') {
+                loadServices("running");
+            }
+        });
     </script>
 </body>
 </html>
