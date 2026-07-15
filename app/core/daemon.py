@@ -9,6 +9,7 @@ They both run in background but the main diff is in the manager, the OS, and the
 Service use services.msc and linux use systemctl
 It is harder to use manage service on windows. That's why this backend is here.
 """
+
 STATUS_MAP = {
     1: "Stopped",
     2: "Start Pending",
@@ -18,6 +19,7 @@ STATUS_MAP = {
     6: "Pause Pending",
     7: "Paused",
 }
+
 TYPES_MAP = {
     win32service.SERVICE_WIN32_OWN_PROCESS: "Own Process",
     win32service.SERVICE_WIN32_SHARE_PROCESS: "Share Process",
@@ -87,9 +89,6 @@ def get_running_services():
 
     services.sort(key=lambda service: service["name"].lower())
     return services
-
-# services=get_running_services()
-# print(services)
 
 def start_service(service_name, machine=None, wait=True):
     try:
