@@ -10,6 +10,8 @@ Service use services.msc and linux use systemctl
 It is harder to use manage service on windows. That's why this backend is here.
 """
 
+TIMEOUT_IN_SECOND=50
+
 STATUS_MAP = {
     1: "Stopped",
     2: "Start Pending",
@@ -94,27 +96,20 @@ def start_service(service_name, machine=None, wait=True):
     try:
         status = win32serviceutil.QueryServiceStatus(service_name, machine)
         if status[1] == win32service.SERVICE_RUNNING:
-            print(f"Service '{service_name}' is already running")
-            return True
+            return {"success": True, "message": f"'{service_name}' is already running"}
         
-        print(f"Starting service '{service_name}'...")
         win32serviceutil.StartService(service_name, machine)
         
         if wait:
-            # Wait for service to start (optional)
-            timeout = 30  # seconds
             start_time = time.time()
-            while time.time() - start_time < timeout:
+            while time.time() - start_time < TIMEOUT_IN_SECOND:
                 status = win32serviceutil.QueryServiceStatus(service_name, machine)
                 if status[1] == win32service.SERVICE_RUNNING:
-                    print(f"Service '{service_name}' started successfully")
-                    return True
+                    return {"success": True, "message": f"'{service_name}' is already running"}
                 time.sleep(1)
-            print(f"Timeout waiting for service '{service_name}' to start")
-            return False
+                return {"success": False, "message": "Timeout reached for starting service"}
         
-        return True
+        return {"success": True, "message": f"'{service_name}' start requested"}
         
     except Exception as e:
-        print(f"Failed to start service '{service_name}': {e}")
-        return False
+        return {"success": False, "message": str(e)}
