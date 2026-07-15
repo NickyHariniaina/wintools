@@ -63,7 +63,7 @@ def get_running_services():
 
     scm = open_SCM_with_enumerate_service()
     
-    raw = query(scm, win32service.SERVICE_WIN32, win32service.SERVICE_STATE_ALL)
+    raw = query(scm, win32service.SERVICE_WIN32, win32service.SERVICE_ACTIVE)
 
     win32service.CloseServiceHandle(scm)
 
